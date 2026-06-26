@@ -16,3 +16,6 @@ langgraph-cli[inmem]
 aiohttp>=3.13.4
 Pygments>=2.20.0
 cryptography>=46.0.7
+
+langchain-google-genai
+langchain-groq
