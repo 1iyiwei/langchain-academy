@@ -1,8 +1,12 @@
 from langchain_core.messages import SystemMessage
+
 from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langgraph.graph import START, StateGraph, MessagesState
 from langgraph.prebuilt import tools_condition, ToolNode
+
+import os
 
 def add(a: int, b: int) -> int:
     """Adds a and b.
@@ -34,7 +38,10 @@ def divide(a: int, b: int) -> float:
 tools = [add, multiply, divide]
 
 # Define LLM with bound tools
-llm = ChatOpenAI(model="gpt-4o")
+
+use_google_instead_of_openai = os.environ.get("GOOGLE_API_KEY") is not None
+llm =  ChatGoogleGenerativeAI(model="gemini-2.5-flash") if use_google_instead_of_openai else ChatOpenAI(model="gpt-4o")
+
 llm_with_tools = llm.bind_tools(tools)
 
 # System message
