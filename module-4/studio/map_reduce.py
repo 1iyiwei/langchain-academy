@@ -4,10 +4,13 @@ from typing_extensions import TypedDict
 
 from pydantic import BaseModel
 
-from langchain_openai import ChatOpenAI 
+from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 
 from langgraph.constants import Send
 from langgraph.graph import END, StateGraph, START
+
+import os
 
 # Prompts we will use
 subjects_prompt = """Generate a list of 3 sub-topics that are all related to this overall topic: {topic}."""
@@ -15,7 +18,9 @@ joke_prompt = """Generate a joke about {subject}"""
 best_joke_prompt = """Below are a bunch of jokes about {topic}. Select the best one! Return the ID of the best one, starting 0 as the ID for the first joke. Jokes: \n\n  {jokes}"""
 
 # LLM
-model = ChatOpenAI(model="gpt-4o", temperature=0) 
+use_google_instead_of_openai = os.environ.get("GOOGLE_API_KEY") is not None
+
+llm = ChatGoogleGenerativeAI(model="gemini-2.5-flash") if use_google_instead_of_openai else ChatOpenAI(model="gpt-4o", temperature=0)
 
 # Define the state
 class Subjects(BaseModel):
@@ -23,7 +28,7 @@ class Subjects(BaseModel):
 
 class BestJoke(BaseModel):
     id: int
-    
+
 class OverallState(TypedDict):
     topic: str
     subjects: list
